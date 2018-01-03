@@ -1,3 +1,7 @@
+== 1.1.0 ==
++ ES6-ified codebase
++ Fixed init output not printing config port
+
 == 1.0.0 ==
 + Implemented core service with GET / and POST /
 + Implemented SSL HTTP serving
