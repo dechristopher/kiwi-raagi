@@ -6,17 +6,21 @@ Raagi allows communication with gameservers through commands passed by the reque
 
 * [ GET / ] Responds with service version
   * Response format:
+
     ```json
     {"version":"..."}
     ```
 
 * [ POST / ] Sends command to server and responds with RCON response
   * Request Parameters:
+
     ```text
     sid = server index number within config.js
     command = command to send to server
     ```
+
   * Response format:
+
     ```json
     {"command":"...", "output":"..."}
     ```
