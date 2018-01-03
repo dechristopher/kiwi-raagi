@@ -27,7 +27,10 @@ Raagi allows communication with gameservers through commands passed by the reque
 
 ## Configuration
 
-* config.js should contain the following:
+1. Begin by running '**npm install**' from the root project directory
+
+2. Ensure **config.js** contains the following:
+
     ```json
     {
         "version": "1.0.0",
@@ -41,4 +44,6 @@ Raagi allows communication with gameservers through commands passed by the reque
     }
     ```
 
-* private.key and ssl.crt should be placed in root project directory
+3. Ensure **private.key** and **ssl.crt** are placed in root project directory
+
+4. Start the application with '**npm start**' or '**node index.js**'
