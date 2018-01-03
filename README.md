@@ -29,12 +29,17 @@ Raagi allows communication with gameservers through commands passed by the reque
 
 1. Begin by running '**npm install**' from the root project directory
 
-2. Ensure **config.js** contains the following:
+2. Create a **config.json** containing the following:
 
     ```json
     {
-        "version": "1.0.0",
+        "version": "1.1.0",
         "port": 3000,
+        "ssl": {
+            "enabled": true,
+            "certfile": "./ssl.crt",
+            "pkeyfile": "./private.key"
+        },
         "servers": [
             { "id": "server1", "ip": "127.0.0.1:27015", "pw": "password" },
             { "id": "server2", "ip": "127.0.0.1:27016", "pw": "password" },
@@ -44,6 +49,6 @@ Raagi allows communication with gameservers through commands passed by the reque
     }
     ```
 
-3. Ensure **private.key** and **ssl.crt** are placed in root project directory
+3. Ensure your configured SSL cert and private key are placed in root project directory
 
 4. Start the application with '**npm start**' or '**node index.js**'
