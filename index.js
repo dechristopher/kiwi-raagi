@@ -7,25 +7,32 @@ const https = require('https');
 const rcon = require('srcds-rcon');
 const fs = require('fs');
 
+// Custom modules
+const ascii = require('./modules/ascii.js');
+const log = require('./modules/log.js');
+
 // Build configuration
 const conf = JSON.parse(fs.readFileSync('./config.json'));
 
 // Inject bodyParser middleware to get request body
-//app.use(bodyParser.json()); // to support JSON-encoded bodies
+//app.use(bodyParser.json()); // to support JSON-encoded bodies (currently disabled)
 app.use(bodyParser.urlencoded({ // to support URL-encoded bodies
     extended: true
 }));
 
 // Respond with service version in format:
-// {"version":"..."}
+// Response Format (JSON) : {"version":"..."}
 app.get('/', (req, res) => {
     res.setHeader("Content-Type", "application/json");
     res.send(`{"version":"` + conf.version + `"}`);
-    console.log("[raagi] [GET /] (" + req.ip + ")");
+    log('[GET /] (' + req.ip + ')', undefined, true);
 });
 
-// Send command to server and reply with response in format:
-// {"command":"...", "output":"..."}
+// Send command to server and reply with rcon command response:
+// Request Parameters:
+//	- sid: server index from config.json [req.body.sid]
+//	- command: command to run on remote server [req.body.command]
+// Response Format (JSON) : {"command":"...", "output":"..."}
 app.post('/', (req, res) => {
     let conn = rcon({
         address: conf.servers[req.body.sid].ip,
@@ -35,7 +42,7 @@ app.post('/', (req, res) => {
         return conn.command(req.body.command).then((status) => {
             res.setHeader("Content-Type", "application/json");
             res.send(`{"command":"` + req.body.command + `", "output":"${status}"}`);
-            console.log("[raagi] [POST /] (" + req.ip + ")");
+            log('[POST /] (' + req.ip + ") -> [S: '" + conf.servers[req.body.sid].id + "'] [CMD: '" + req.body.command + "']", undefined, true);
         });
     }).then(() => conn.disconnect());
 });
@@ -54,5 +61,5 @@ if (conf.ssl.enabled) {
     app.listen(conf.port, () => { /* Do stuff... */ });
 }
 
-// Print startup information
-console.log('[raagi] Init kiwi/raagi | v' + conf.version + " | *:" + conf.port + " | SSL: " + conf.ssl.enabled);
+ascii(); // Print ascii and startup information
+log('Init kiwi/raagi | v' + conf.version + " | *:" + conf.port + " | SSL: " + conf.ssl.enabled, undefined, true);
