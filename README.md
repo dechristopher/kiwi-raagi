@@ -33,7 +33,6 @@ Raagi allows communication with gameservers through commands passed by the reque
 
     ```json
     {
-        "version": "1.1.0",
         "port": 3000,
         "ssl": {
             "enabled": true,

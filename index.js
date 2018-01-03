@@ -13,6 +13,7 @@ const log = require('./modules/log.js');
 
 // Build configuration
 const conf = JSON.parse(fs.readFileSync('./config.json'));
+const version = require('./package').version;
 
 // Inject bodyParser middleware to get request body
 //app.use(bodyParser.json()); // to support JSON-encoded bodies (currently disabled)
@@ -62,4 +63,4 @@ if (conf.ssl.enabled) {
 }
 
 ascii(); // Print ascii and startup information
-log('Init kiwi/raagi | v' + conf.version + " | *:" + conf.port + " | SSL: " + conf.ssl.enabled, undefined, true);
+log('Init kiwi/raagi | v' + version + " | *:" + conf.port + " | SSL: " + conf.ssl.enabled, undefined, true);
