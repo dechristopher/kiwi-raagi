@@ -10,12 +10,6 @@ const fs = require('fs');
 // Build configuration
 const conf = JSON.parse(fs.readFileSync('./config.json'));
 
-// Configure SSL
-var options = {
-    key: fs.readFileSync('./private.key'),
-    cert: fs.readFileSync('./ssl.crt')
-};
-
 // Inject bodyParser middleware to get request body
 //app.use(bodyParser.json()); // to support JSON-encoded bodies
 app.use(bodyParser.urlencoded({ // to support URL-encoded bodies
@@ -46,6 +40,19 @@ app.post('/', (req, res) => {
     }).then(() => conn.disconnect());
 });
 
-// Listen for requests
-https.createServer(options, app).listen(conf.port);
-console.log('[raagi] Init kiwi/raagi | v' + conf.version + " | *:" + conf.port);
+// SSL Mode Logic
+if (conf.ssl.enabled) {
+    // Configure SSL
+    var options = {
+        key: fs.readFileSync(conf.ssl.pkeyfile),
+        cert: fs.readFileSync(conf.ssl.certfile)
+    };
+    // Listen for requests
+    https.createServer(options, app).listen(conf.port);
+} else {
+    //No SSL
+    app.listen(conf.port, () => { /* Do stuff... */ });
+}
+
+// Print startup information
+console.log('[raagi] Init kiwi/raagi | v' + conf.version + " | *:" + conf.port + " | SSL: " + conf.ssl.enabled);
