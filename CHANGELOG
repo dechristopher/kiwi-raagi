@@ -1,3 +1,10 @@
+== 1.2.0 ==
++ Added SSL configuration options
++ Implemented wholesome logging using a repurposed log.js from talon
++ Improved POST / logging to include command and server
++ Vastly improved code documentation throughout the application
++ Added ASCII art on statup (modules/ascii.js)
+
 == 1.1.0 ==
 + ES6-ified codebase
 + Fixed init output not printing config port
