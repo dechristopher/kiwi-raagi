@@ -1,7 +1,7 @@
 // kiwi/raagi - Created January 2nd, 2018
 
 const express = require('express');
-var bodyParser = require('body-parser');
+const bodyParser = require('body-parser');
 const app = express();
 const https = require('https');
 const rcon = require('srcds-rcon');
@@ -48,4 +48,4 @@ app.post('/', (req, res) => {
 
 // Listen for requests
 https.createServer(options, app).listen(conf.port);
-console.log('[raagi] Init kiwi/raagi | v' + conf.version + " | *:3000");
+console.log('[raagi] Init kiwi/raagi | v' + conf.version + " | *:" + conf.port);
