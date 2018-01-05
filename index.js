@@ -21,6 +21,18 @@ app.use(bodyParser.urlencoded({ // to support URL-encoded bodies
     extended: true
 }));
 
+// Ensure all requests contain the auth token header:
+// KIWI-Raagi-Auth-Token
+app.use(function(req, res, next) {
+    if (req.header("KIWI-Raagi-Auth-Token") !== conf.authtoken) {
+        log("Auth failed: " + req.ip, undefined, true);
+        res.sendStatus(404);
+        res.end();
+        return;
+    }
+    next();
+});
+
 // Respond with service version in format:
 // Response Format (JSON) : {"version":"..."}
 app.get('/', (req, res) => {
