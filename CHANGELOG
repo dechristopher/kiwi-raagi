@@ -1,3 +1,6 @@
+== 1.2.2 ==
++ Added auth token verification middleware
+
 == 1.2.1 ==
 + Improved legibility of ascii art
 + Documented ascii.js
