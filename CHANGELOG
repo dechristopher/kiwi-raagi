@@ -1,3 +1,8 @@
+== 1.3.0 ==
++ Added GET /status/:id endpoint for getting JSON server status information
++ Added HTTP prefix stored in conf.ssl.prefix
++ Changed ascii to include KIWI copyright and year
+
 == 1.2.2 ==
 + Added auth token verification middleware
 
