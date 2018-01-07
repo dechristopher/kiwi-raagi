@@ -31,6 +31,7 @@ app.use(bodyParser.urlencoded({ // to support URL-encoded bodies
 
 // Ensure all requests contain the auth token header:
 // KIWI-Raagi-Auth-Token
+// Response Code: (401 Unauthorized)
 app.use(function(req, res, next) {
     if (req.header("KIWI-Raagi-Auth-Token") !== conf.authtoken) {
         log("Auth failed: " + req.ip, undefined, true);
@@ -39,6 +40,60 @@ app.use(function(req, res, next) {
         return;
     }
     next();
+});
+
+// SID Checker middleware to not break the handlers
+// Response Code: (400 Bad Request)
+app.use(function(req, res, next) {
+    if (req.body.sid === undefined && req.params.sid === undefined) {
+        // both param and body are undefined
+        next();
+    } else {
+        //parse sid
+        let sid = -1;
+        if (req.body.sid !== undefined) {
+            sid = Number(req.body.sid);
+        } else {
+            sid = Number(req.params.sid);
+        }
+
+        // run check
+        if (sid > -1 && sid < conf.servers.length) {
+            next();
+        } else {
+            log('Bad request: ' + req.ip + ' -> invalid sid [' + sid + ']', undefined, true);
+            res.sendStatus(400);
+            res.end();
+            return;
+        }
+    }
+});
+
+// SID Checker middleware to not break the handlers
+// Response Code: (400 Bad Request)
+app.use('/status/:sid', function(req, res, next) {
+    if (req.body.sid === undefined && req.params.sid === undefined) {
+        // both param and body are undefined
+        next();
+    } else {
+        //parse sid
+        let sid = -1;
+        if (req.body.sid !== undefined) {
+            sid = Number(req.body.sid);
+        } else {
+            sid = Number(req.params.sid);
+        }
+
+        // run check
+        if (sid > -1 && sid < conf.servers.length) {
+            next();
+        } else {
+            log('Bad request: ' + req.ip + ' -> invalid sid [' + sid + ']', undefined, true);
+            res.sendStatus(400);
+            res.end();
+            return;
+        }
+    }
 });
 
 // Respond with service version in format:
