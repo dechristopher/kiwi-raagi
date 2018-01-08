@@ -1,6 +1,6 @@
 {
     "name": "raagi",
-    "version": "1.3.2",
+    "version": "1.3.4",
     "description": "{ RCON Service } (Node.js) Allows communication with gameservers to pull information and gather stats. Runs arbitrary commands through the RCON protocol.",
     "main": "index.js",
     "scripts": {
