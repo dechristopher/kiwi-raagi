@@ -57,7 +57,6 @@ app.use(function(req, res, next) {
         } else {
             sid = Number(req.params.sid);
         }
-
         // run check
         if (sid > -1 && sid < conf.servers.length) {
             next();
@@ -87,7 +86,6 @@ app.use('/status/:sid', function(req, res, next) {
         } else {
             sid = Number(req.params.sid);
         }
-
         // run check
         if (sid > -1 && sid < conf.servers.length) {
             next();
@@ -106,8 +104,45 @@ app.use('/status/:sid', function(req, res, next) {
 // Response Format (JSON) : {"version":"..."}
 app.get('/', (req, res) => {
     res.setHeader("Content-Type", "application/json");
-    res.send(`{"version":"` + conf.version + `"}`);
+    res.send(`{"version":"` + version + `"}`);
     log('[GET /] (' + req.ip + ')', undefined, true);
+});
+
+// Respond with calculated latency to server in ms
+// Response Code (400) if time not provided or in future
+// Response Format (JSON) : {"latency":"X"}
+app.post('/latency', (req, res) => {
+    // Ensure client sends time
+    if (req.body.time === undefined) {
+        log('[POST /latency] Bad request: ' + req.ip + ' -> time not provided', undefined, true);
+        res.setHeader("Content-Type", "application/json");
+        res.sendStatus(400);
+        res.send(`{"error":"time not provided"`);
+        res.end();
+        return;
+    }
+    //console.log("Req time: " + req.body.time);
+    // Calculate latency
+    let clientTime = Number(req.body.time);
+    //console.log("Client time: " + clientTime);
+    //let time = new Date();
+    let serverTime = (new Date()).getTime();
+    //console.log("Server time: " + serverTime);
+    let latency = serverTime - clientTime;
+    //console.log("Latency: " + latency);
+    // Ensure client is not in the future
+    if (latency < 0) {
+        log('[POST /latency] Bad request: ' + req.ip + ' -> invalid client time (future?)', undefined, true);
+        res.setHeader("Content-Type", "application/json");
+        res.sendStatus(400);
+        res.send(`{"error":"invalid time (future?)"`);
+        res.end();
+        return;
+    }
+    // Send normal response
+    res.setHeader("Content-Type", "application/json");
+    res.send(`{"latency":"` + latency + `"}`);
+    log('[POST /latency] (' + req.ip + ')', undefined, true);
 });
 
 // Send command to server and reply with rcon command response:
