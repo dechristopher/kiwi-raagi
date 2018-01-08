@@ -44,6 +44,7 @@ app.use(function(req, res, next) {
 
 // SID Checker middleware to not break the handlers
 // Response Code: (400 Bad Request)
+// Response Body: {"error": "invalid sid - x"}
 app.use(function(req, res, next) {
     if (req.body.sid === undefined && req.params.sid === undefined) {
         // both param and body are undefined
@@ -62,7 +63,9 @@ app.use(function(req, res, next) {
             next();
         } else {
             log('Bad request: ' + req.ip + ' -> invalid sid [' + sid + ']', undefined, true);
+            res.setHeader("Content-Type", "application/json");
             res.sendStatus(400);
+            res.send(`{"error":"invalid sid - ` + sid + `"`);
             res.end();
             return;
         }
@@ -71,6 +74,7 @@ app.use(function(req, res, next) {
 
 // SID Checker middleware to not break the handlers
 // Response Code: (400 Bad Request)
+// Response Body: {"error": "invalid sid - x"}
 app.use('/status/:sid', function(req, res, next) {
     if (req.body.sid === undefined && req.params.sid === undefined) {
         // both param and body are undefined
@@ -89,7 +93,9 @@ app.use('/status/:sid', function(req, res, next) {
             next();
         } else {
             log('Bad request: ' + req.ip + ' -> invalid sid [' + sid + ']', undefined, true);
+            res.setHeader("Content-Type", "application/json");
             res.sendStatus(400);
+            res.send(`{"error":"invalid sid - ` + sid + `"`);
             res.end();
             return;
         }
