@@ -36,6 +36,7 @@ All endpoints require the "**KIWI-Raagi-Auth-Token**" header to be set properly 
     ```json
     {
         "port": 3000,
+        "timeout": 3000,
         "authtoken": "token",
         "ssl": {
             "enabled": true,
