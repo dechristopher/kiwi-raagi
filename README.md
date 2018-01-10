@@ -13,6 +13,19 @@ All endpoints require the "**KIWI-Raagi-Auth-Token**" header to be set properly 
     {"version":"..."}
     ```
 
+* [ POST /latency ] Calculates client latency to service
+  * Request Parameters:
+
+    ```text
+    time = current milliseconds since Unix epoch
+    ```
+
+  * Response format:
+
+    ```json
+    {"latency":"Xms"}
+    ```
+
 * [ POST / ] Sends command to server and responds with RCON response
   * Request Parameters:
 
@@ -25,6 +38,24 @@ All endpoints require the "**KIWI-Raagi-Auth-Token**" header to be set properly 
 
     ```json
     {"command":"...", "output":"..."}
+    ```
+
+* [ GET /status/:sid ] Gets current information from server
+  * Request Parameters:
+
+    ```text
+    sid = server index number within config.js
+    ```
+
+  * Response format:
+
+    ```json
+    {
+        "sid": x,
+        "online": true,
+        "players": x,
+        "bots": x,
+    }
     ```
 
 ## Configuration
