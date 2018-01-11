@@ -1,3 +1,7 @@
+== 1.4.1 ==
++ Added graceful shutdown procedures on SIGINT and SIGTERM
++ Standardized single/double quote programming style to single quotes
+
 == 1.4.0 ==
 + Added RCON connection timeouts
 + Added configurable global request timeout in config.json
