@@ -1,5 +1,6 @@
 // kiwi/raagi - Created January 2nd, 2018
 
+// NPM modules
 const express = require('express');
 const bodyParser = require('body-parser');
 const app = express();
@@ -16,6 +17,9 @@ const log = require('./modules/log.js');
 // Build configuration
 const conf = JSON.parse(fs.readFileSync('./config.json'));
 const version = require('./package').version;
+
+// HTTP server variable
+let srv;
 
 // Set http prefix
 if (conf.ssl.enabled) {
@@ -79,7 +83,7 @@ app.use(function(req, res, next) {
             next();
         } else {
             log(`Bad request: ${req.ip} -> invalid sid [${sid}]`, undefined, true);
-            res.setHeader("Content-Type", "application/json");
+            res.setHeader('Content-Type', 'application/json');
             res.sendStatus(400);
             res.send(`{"error":"invalid sid - ${sid}"}`);
             res.end();
@@ -108,7 +112,7 @@ app.use('/status/:sid', function(req, res, next) {
             next();
         } else {
             llog(`Bad request: ${req.ip} -> invalid sid [${sid}]`, undefined, true);
-            res.setHeader("Content-Type", "application/json");
+            res.setHeader('Content-Type', 'application/json');
             res.sendStatus(400);
             res.send(`{"error":"invalid sid - ${sid}"}`);
             res.end();
@@ -120,7 +124,7 @@ app.use('/status/:sid', function(req, res, next) {
 // Respond with service version in format:
 // Response Format (JSON) : {"version":"..."}
 app.get('/', (req, res) => {
-    res.setHeader("Content-Type", "application/json");
+    res.setHeader('Content-Type', 'application/json');
     res.send(`{"version":"${version}"}`);
     log(`[GET /] ( ${req.ip} )`, undefined, true);
 });
@@ -132,7 +136,7 @@ app.post('/latency', (req, res) => {
     // Ensure client sends time
     if (req.body.time === undefined) {
         log(`[POST /latency] Bad request: ( ${req.ip} ) -> time not provided`, undefined, true);
-        res.setHeader("Content-Type", "application/json");
+        res.setHeader('Content-Type', 'application/json');
         res.sendStatus(400);
         res.send(`{"error":"time not provided"`);
         res.end();
@@ -150,14 +154,14 @@ app.post('/latency', (req, res) => {
     // Ensure client is not in the future
     if (latency < 0) {
         log(`[POST /latency] Bad request: ( ${req.ip} ) -> invalid client time (future?)`, undefined, true);
-        res.setHeader("Content-Type", "application/json");
+        res.setHeader('Content-Type', 'application/json');
         res.sendStatus(400);
         res.send(`{"error":"invalid time (future?)"`);
         res.end();
         return;
     }
     // Send normal response
-    res.setHeader("Content-Type", "application/json");
+    res.setHeader('Content-Type', 'application/json');
     res.send(`{"latency":"${latency}"}`);
     log(`[POST /latency] ( ${req.ip} ) -> Latency: ${latency}ms`, undefined, true);
 });
@@ -180,7 +184,7 @@ app.post('/', (req, res) => {
                 con.disconnect();
                 return;
             }
-            res.setHeader("Content-Type", "application/json");
+            res.setHeader('Content-Type', 'application/json');
             res.send(`{"command":"${req.body.command}", "output":"${status}"}`);
             log(`[POST /] ( ${req.ip} ) -> [S: '${conf.servers[req.body.sid].id}'] [CMD: '${req.body.command}']`, undefined, true);
         });
@@ -255,13 +259,38 @@ if (conf.ssl.enabled) {
         cert: fs.readFileSync(conf.ssl.certfile)
     };
     // Listen for requests
-    let srv = https.createServer(options, app).listen(conf.port, () => { /* Do stuff... */ });
+    srv = https.createServer(options, app).listen(conf.port, () => { /* Do stuff... */ });
     srv.timeout = conf.timeout;
 } else {
     //No SSL
-    let srv = app.listen(conf.port, () => { /* Do stuff... */ });
+    srv = app.listen(conf.port, () => { /* Do stuff... */ });
     srv.timeout = conf.timeout;
 }
+
+// Initiate shutdown procedures
+function terminate() {
+    // Attempt a graceful shutdown on SIGTERM
+    srv.close(function() {
+        log('Init service shutdown', undefined, true);
+        process.exit(0);
+        // Close db, rcon connections, and etc...
+    });
+    // Hard quit if service cannot gracefully shutdown after 10 seconds
+    setTimeout(function() {
+        console.error('[raagi] Could not close connections in time, forcefully shutting down!');
+        process.exit(1);
+    }, 10 * 1000);
+}
+
+// Catch the termination signal and operate on it
+process.on('SIGTERM', function() {
+    terminate();
+});
+
+// Catch the interrupt signal and operate on it
+process.on('SIGINT', function() {
+    terminate();
+});
 
 ascii(); // Print ascii and startup information
 log(`Init kiwi/raagi | v${version} | *:${conf.port} | SSL: ${conf.ssl.enabled}`, undefined, true);
