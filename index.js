@@ -28,12 +28,6 @@ if (conf.ssl.enabled) {
     conf.ssl.prefix = "http";
 }
 
-// Inject bodyParser middleware to get request body
-app.use(bodyParser.json()); // to support JSON-encoded bodies (currently disabled)
-app.use(bodyParser.urlencoded({ // to support URL-encoded bodies
-    extended: true
-}));
-
 // Set up timeout middleware options
 var timeoutOptions = {
     timeout: conf.timeout,
@@ -49,6 +43,12 @@ var timeoutOptions = {
 
 // Ensure requests time out after 2 seconds
 app.use(timeout.handler(timeoutOptions));
+
+// Inject bodyParser middleware to get request body
+app.use(bodyParser.json()); // to support JSON-encoded bodies (currently disabled)
+app.use(bodyParser.urlencoded({ // to support URL-encoded bodies
+    extended: true
+}));
 
 // Ensure all requests contain the auth token header:
 // KIWI-Raagi-Auth-Token
