@@ -1,3 +1,6 @@
+== 1.4.2 ==
++ CHanged order of middleware handler injeciton so timeout middleware is handled first
+
 == 1.4.1 ==
 + Added graceful shutdown procedures on SIGINT and SIGTERM
 + Standardized single/double quote programming style to single quotes
