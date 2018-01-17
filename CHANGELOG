@@ -1,18 +1,33 @@
+--- LEGEND ----
++ Addition     |
+~ Modification |
+- Deletion     |
+---------------
+
+== 1.5.0 ==
+~ Overhauled log.js for speed and verbosity
+    ~ Templatized strings
+    ~ Improved control flow logic
+    + Added hostname to log output
+    + Added more documentation
+~ Updated raagi to use new log.js features
+~ Set error timeout before calling shutdown procedures
+
 == 1.4.2 ==
-+ CHanged order of middleware handler injeciton so timeout middleware is handled first
+~ Changed order of middleware handler injeciton so timeout middleware is handled first
 
 == 1.4.1 ==
 + Added graceful shutdown procedures on SIGINT and SIGTERM
-+ Standardized single/double quote programming style to single quotes
+~ Standardized single/double quote programming style to single quotes
 
 == 1.4.0 ==
 + Added RCON connection timeouts
 + Added configurable global request timeout in config.json
-+ Changed all logging to templated strings
+~ Changed all logging to templated strings
 
 == 1.3.4 ==
 + Added POST /latency endpoint for getting client latency to backend
-+ Fixed regression with GET / not using proper version variable
+~ Fixed regression with GET / not using proper version variable
 
 == 1.3.3 ==
 + Added JSON error message to sid middlwares
@@ -23,25 +38,25 @@
 == 1.3.0 ==
 + Added GET /status/:id endpoint for getting JSON server status information
 + Added HTTP prefix stored in conf.ssl.prefix
-+ Changed ascii to include KIWI copyright and year
+~ Changed ascii to include KIWI copyright and year
 
 == 1.2.2 ==
 + Added auth token verification middleware
 
 == 1.2.1 ==
-+ Improved legibility of ascii art
+~ Improved legibility of ascii art
 + Documented ascii.js
 
 == 1.2.0 ==
 + Added SSL configuration options
 + Implemented wholesome logging using a repurposed log.js from talon
-+ Improved POST / logging to include command and server
-+ Vastly improved code documentation throughout the application
+~ Improved POST / logging to include command and server
+~ Vastly improved code documentation throughout the application
 + Added ASCII art on statup (modules/ascii.js)
 
 == 1.1.0 ==
-+ ES6-ified codebase
-+ Fixed init output not printing config port
+~ ES6-ified codebase
+~ Fixed init output not printing config port
 
 == 1.0.0 ==
 + Implemented core service with GET / and POST /
