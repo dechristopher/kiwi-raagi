@@ -1,10 +1,12 @@
 // kiwi/log.js - Created on on September 1st, 2016
 
+// NPM modules
 const fs = require('fs');
 const os = require('os');
 const c = require('chalk');
 const datetime = require('node-datetime');
 
+// Static variables
 const hostname = os.hostname();
 const LOG = `[${c.green('raagi')} ~ ${hostname}]`;
 
@@ -22,7 +24,7 @@ module.exports = function(message, options = { 'logName': '', 'stdOut': true }) 
     let time = datetime.create().format('m-d-y H:M:S');
     let today = datetime.create().format('m-d-y');
 
-    //Easy prefix variable that includes time and logging prefix
+    //Variable that includes time and logging prefix
     let prefix = `[${time}] ${LOG}`;
 
     // Default filename
