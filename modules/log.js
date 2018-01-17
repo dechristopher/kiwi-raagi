@@ -5,52 +5,65 @@ const os = require('os');
 const c = require('chalk');
 const datetime = require('node-datetime');
 
-const LOG = '[' + c.green('raagi') + '] ';
+const hostname = os.hostname();
+const LOG = `[${c.green('raagi')} ~ ${hostname}]`;
 
-// Wraps console.log for printing date in front
-// message: (string) message to log
-// logname: (string) name of sub-log file (defaults to global log file)
-// consoleOut: (bool) whether or not to print log to console (defaults to true)
-function log(message, logname, consoleOut) {
+/* Wraps console.log for printing pretty logging to stdout and to a file
+    message: (string) message to log
+    options: (object) logging configuration options
+        Format:
+        {
+            logName: 'name of sub-log file' (default: none/undefined (global file log)) [appends to log file name XX-XX-XX-name.log]
+            stdOut: 'whether or not to print log to console' (default: true)
+        }
+*/
+module.exports = function(message, options = { 'logName': '', 'stdOut': true }) {
+    // Define date formats for current function call
     let time = datetime.create().format('m-d-y H:M:S');
     let today = datetime.create().format('m-d-y');
-    let file = '';
-    let line = '';
+
+    //Easy prefix variable that includes time and logging prefix
+    let prefix = `[${time}] ${LOG}`;
+
+    // Default filename
+    let file = `logs/${today}.log`;
+    // Default line format
+    let line = `${prefix} ${message}`;
 
     // Handle logname argument
-    if (logname === undefined) {
-        file = 'logs/' + today + '.log';
-        line = '[' + time + '] ' + LOG + message;
-    } else {
-        file = 'logs/' + today + '-' + logname + '.log';
-        line = '[' + time + ']' + '[' + logname + '] ' + LOG + message;
+    if (options.logName !== undefined && options.logName !== '') {
+        file = `logs/${today}-${options.logName}.log`;
+        line = `${prefix} [${options.logName}] ${message}`;
     }
 
     // Handle consoleOut argument
-    if (consoleOut === undefined) {
+    if (options.stdOut !== false) {
         console.log(line);
-    } else if (consoleOut === true) {
-        console.log(line);
-    } else if (consoleOut === false) {
-        // Do nothing
     }
 
+    // Begin log file ops
     fs.exists(file, function(exists) {
         if (exists) {
-            fs.appendFile(file, line + os.EOL, function(err) {
+            // Write log entry
+            fs.appendFile(file, `${line}${os.EOL}`, function(err) {
                 if (err) {
-                    return console.log(LOG + 'FILE LOGGING FAILED AT ' + time + 'for MSG: ' + line);
+                    return console.log(`${prefix} FILE LOGGING FAILED AT ${time} FOR MSG: ${line}`);
                 }
             });
         } else {
-            fs.writeFile(file, 'BEGIN RAAGI LOG FOR ' + today + os.EOL, function(err) {
+            // Create the file
+            fs.writeFile(file, `BEGIN RAAGI LOG FOR ${today}${os.EOL}`, function(err) {
                 if (err) {
-                    return console.log(LOG + 'LOG FILE CREATION FAILED AT ' + time + 'for FILE: ' + file);
+                    return console.log(`${prefix} LOG FILE CREATION FAILED AT ${time} FOR FILE: ${file}`);
                 }
-                console.log(LOG + 'Created new log >> ' + file);
+                console.log(`${prefix} Created new log >> ${file}`);
+            });
+            // Write log entry
+            fs.appendFile(file, `${line}${os.EOL}`, function(err) {
+                if (err) {
+                    return console.log(`${prefix} FILE LOGGING FAILED AT ${time} FOR MSG: ${line}`);
+                }
             });
         }
     });
-}
-
-module.exports = log;
+};
