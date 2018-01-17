@@ -55,7 +55,7 @@ app.use(bodyParser.urlencoded({ // to support URL-encoded bodies
 // Response Code: (401 Unauthorized)
 app.use(function(req, res, next) {
     if (req.header("KIWI-Raagi-Auth-Token") !== conf.authtoken) {
-        log("Auth failed: " + req.ip, undefined, true);
+        log(`Auth failed: ${req.ip}`);
         res.sendStatus(401);
         res.end();
         return;
@@ -82,7 +82,7 @@ app.use(function(req, res, next) {
         if (sid > -1 && sid < conf.servers.length) {
             next();
         } else {
-            log(`Bad request: ${req.ip} -> invalid sid [${sid}]`, undefined, true);
+            log(`Bad request: ${req.ip} -> invalid sid [${sid}]`);
             res.setHeader('Content-Type', 'application/json');
             res.sendStatus(400);
             res.send(`{"error":"invalid sid - ${sid}"}`);
@@ -111,7 +111,7 @@ app.use('/status/:sid', function(req, res, next) {
         if (sid > -1 && sid < conf.servers.length) {
             next();
         } else {
-            llog(`Bad request: ${req.ip} -> invalid sid [${sid}]`, undefined, true);
+            llog(`Bad request: ${req.ip} -> invalid sid [${sid}]`);
             res.setHeader('Content-Type', 'application/json');
             res.sendStatus(400);
             res.send(`{"error":"invalid sid - ${sid}"}`);
@@ -126,7 +126,7 @@ app.use('/status/:sid', function(req, res, next) {
 app.get('/', (req, res) => {
     res.setHeader('Content-Type', 'application/json');
     res.send(`{"version":"${version}"}`);
-    log(`[GET /] ( ${req.ip} )`, undefined, true);
+    log(`[GET /] ( ${req.ip} )`);
 });
 
 // Respond with calculated latency to server in ms
@@ -135,7 +135,7 @@ app.get('/', (req, res) => {
 app.post('/latency', (req, res) => {
     // Ensure client sends time
     if (req.body.time === undefined) {
-        log(`[POST /latency] Bad request: ( ${req.ip} ) -> time not provided`, undefined, true);
+        log(`[POST /latency] Bad request: ( ${req.ip} ) -> time not provided`);
         res.setHeader('Content-Type', 'application/json');
         res.sendStatus(400);
         res.send(`{"error":"time not provided"`);
@@ -153,7 +153,7 @@ app.post('/latency', (req, res) => {
     //console.log("Latency: " + latency);
     // Ensure client is not in the future
     if (latency < 0) {
-        log(`[POST /latency] Bad request: ( ${req.ip} ) -> invalid client time (future?)`, undefined, true);
+        log(`[POST /latency] Bad request: ( ${req.ip} ) -> invalid client time (future?)`);
         res.setHeader('Content-Type', 'application/json');
         res.sendStatus(400);
         res.send(`{"error":"invalid time (future?)"`);
@@ -163,7 +163,7 @@ app.post('/latency', (req, res) => {
     // Send normal response
     res.setHeader('Content-Type', 'application/json');
     res.send(`{"latency":"${latency}"}`);
-    log(`[POST /latency] ( ${req.ip} ) -> Latency: ${latency}ms`, undefined, true);
+    log(`[POST /latency] ( ${req.ip} ) -> Latency: ${latency}ms`);
 });
 
 // Send command to server and reply with rcon command response:
@@ -186,7 +186,7 @@ app.post('/', (req, res) => {
             }
             res.setHeader('Content-Type', 'application/json');
             res.send(`{"command":"${req.body.command}", "output":"${status}"}`);
-            log(`[POST /] ( ${req.ip} ) -> [S: '${conf.servers[req.body.sid].id}'] [CMD: '${req.body.command}']`, undefined, true);
+            log(`[POST /] ( ${req.ip} ) -> [S: '${conf.servers[req.body.sid].id}'] [CMD: '${req.body.command}']`);
         });
     }).then(() => {
         conn.disconnect();
@@ -233,7 +233,7 @@ app.get('/status/:sid', (req, res) => {
             respObject.players = Number(humans);
             respObject.bots = Number(bots);
             // Send response
-            log(`[POST /pop/${req.params.sid}] ( ${req.ip} ) -> [S: '${conf.servers[req.params.sid].id}'] [Population: '${humans}']`, undefined, true);
+            log(`[POST /pop/${req.params.sid}] ( ${req.ip} ) -> [S: '${conf.servers[req.params.sid].id}'] [Population: '${humans}']`);
             res.setHeader('Content-Type', 'application/json');
             res.send(respObject);
         } else {
@@ -243,7 +243,7 @@ app.get('/status/:sid', (req, res) => {
             respObject.players = 0;
             respObject.bots = 0;
             // Send error response
-            log(`[POST /pop/${req.params.sid}] ( ${req.ip} ) -> [S: '${conf.servers[req.params.sid].id}'] ERROR: '${error}'`, undefined, true);
+            log(`[POST /pop/${req.params.sid}] ( ${req.ip} ) -> [S: '${conf.servers[req.params.sid].id}'] ERROR: '${error}'`);
             res.setHeader('Content-Type', 'application/json');
             res.sendStatus(503);
             res.send(respObject);
@@ -259,27 +259,27 @@ if (conf.ssl.enabled) {
         cert: fs.readFileSync(conf.ssl.certfile)
     };
     // Listen for requests
-    srv = https.createServer(options, app).listen(conf.port, () => { /* Do stuff... */ });
+    srv = https.createServer(options, app).listen(conf.port, () => { /* Do stuff... */ log(`Service up. Lisening on *:${conf.port}`); });
     srv.timeout = conf.timeout;
 } else {
     //No SSL
-    srv = app.listen(conf.port, () => { /* Do stuff... */ });
+    srv = app.listen(conf.port, () => { /* Do stuff... */ log(`Service up. Lisening on *:${conf.port}`); });
     srv.timeout = conf.timeout;
 }
 
 // Initiate shutdown procedures
 function terminate() {
-    // Attempt a graceful shutdown on SIGTERM
-    srv.close(function() {
-        log('Init service shutdown', undefined, true);
-        process.exit(0);
-        // Close db, rcon connections, and etc...
-    });
     // Hard quit if service cannot gracefully shutdown after 10 seconds
     setTimeout(function() {
         console.error('[raagi] Could not close connections in time, forcefully shutting down!');
         process.exit(1);
     }, 10 * 1000);
+    // Attempt a graceful shutdown on SIGTERM
+    srv.close(function() {
+        log('Init service shutdown');
+        process.exit(0);
+        // Close db, rcon connections, and etc...
+    });
 }
 
 // Catch the termination signal and operate on it
@@ -293,4 +293,4 @@ process.on('SIGINT', function() {
 });
 
 ascii(); // Print ascii and startup information
-log(`Init kiwi/raagi | v${version} | *:${conf.port} | SSL: ${conf.ssl.enabled}`, undefined, true);
+log(`Init kiwi/raagi | v${version} | *:${conf.port} | SSL: ${conf.ssl.enabled}`);
