@@ -4,7 +4,7 @@ Raagi allows communication with gameservers through commands passed by the reque
 
 ## Endpoints
 
-All endpoints require the "**KIWI-Raagi-Auth-Token**" header to be set properly with all requests. This token can be configured in the config.json in the *authtoken* property.
+All endpoints require the "**KIWI-Raagi-Auth-Token**" header to be set properly with all requests. This token can be configured in the config.json with the *authtoken* property.
 
 * [ GET / ] Responds with service version
   * Response format:
@@ -68,11 +68,11 @@ All endpoints require the "**KIWI-Raagi-Auth-Token**" header to be set properly 
     {
         "port": 3000,
         "timeout": 3000,
-        "authtoken": "token",
+        "authToken": "token",
         "ssl": {
             "enabled": true,
-            "certfile": "./ssl.crt",
-            "pkeyfile": "./private.key"
+            "certFile": "./ssl.crt",
+            "pKeyFile": "./private.key"
         },
         "servers": [
             { "id": "server1", "ip": "127.0.0.1:27015", "pw": "password" },
