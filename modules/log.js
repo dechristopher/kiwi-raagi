@@ -26,11 +26,13 @@ module.exports = function(message, options = { 'logName': '', 'stdOut': true }) 
 
     //Variable that includes time and logging prefix
     let prefix = `[${time}] ${LOG}`;
+    let filePrefix = `[${time}] [${hostname}]`;
 
     // Default filename
     let file = `logs/${today}.log`;
     // Default line format
     let line = `${prefix} ${message}`;
+    let fileLine = `${filePrefix} ${message}`;
 
     // Handle logname argument
     if (options.logName !== undefined && options.logName !== '') {
@@ -43,13 +45,16 @@ module.exports = function(message, options = { 'logName': '', 'stdOut': true }) 
         console.log(line);
     }
 
+    // Strip color codes from logs
+    // line = stripColors(line);
+
     // Begin log file ops
     fs.exists(file, function(exists) {
         if (exists) {
             // Write log entry
-            fs.appendFile(file, `${line}${os.EOL}`, function(err) {
+            fs.appendFile(file, `${fileLine}${os.EOL}`, function(err) {
                 if (err) {
-                    return console.log(`${prefix} FILE LOGGING FAILED AT ${time} FOR MSG: ${line}`);
+                    return console.log(`${prefix} FILE LOGGING FAILED AT ${time} FOR MSG: ${fileLine}`);
                 }
             });
         } else {
@@ -61,11 +66,24 @@ module.exports = function(message, options = { 'logName': '', 'stdOut': true }) 
                 console.log(`${prefix} Created new log >> ${file}`);
             });
             // Write log entry
-            fs.appendFile(file, `${line}${os.EOL}`, function(err) {
+            fs.appendFile(file, `${fileLine}${os.EOL}`, function(err) {
                 if (err) {
-                    return console.log(`${prefix} FILE LOGGING FAILED AT ${time} FOR MSG: ${line}`);
+                    return console.log(`${prefix} FILE LOGGING FAILED AT ${time} FOR MSG: ${fileLine}`);
                 }
             });
         }
     });
+};
+
+// Bash color codes
+const colorCodes = [
+    '[30m', '[31m', '[32m', '[33m', '[34m', '[35m', '[36m', '[37m', '[38m', '[39m'
+];
+
+// Strips bash color codes from an input line
+const stripColors = function(line) {
+    colorCodes.forEach(function(code) {
+        line.replace(code, '');
+    });
+    return line;
 };
