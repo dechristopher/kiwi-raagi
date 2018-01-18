@@ -1,10 +1,11 @@
 // kiwi/raagi/modules/ascii.js - Created January 3rd, 2018
 
+// NPM modules
 const chalk = require('chalk');
 
 // Pretty-print 'raagi' in green ascii art
 // http://patorjk.com/software/taag/#p=display&f=Straight&t=raagi
-const ascii = function() {
+module.exports = function() {
     let time = new Date();
     let year = time.getFullYear();
     console.log(
@@ -14,6 +15,3 @@ const ascii = function() {
         chalk.green(`  _/   \n`)
     );
 };
-
-// Export function as module
-module.exports = ascii;
