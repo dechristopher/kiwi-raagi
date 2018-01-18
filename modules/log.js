@@ -32,7 +32,7 @@ module.exports = function(message, options = { 'logName': '', 'stdOut': true }) 
     let file = `logs/${today}.log`;
     // Default line format
     let line = `${prefix} ${message}`;
-    let fileLine = `${filePrefix} ${message}`;
+    let fileLine = `${filePrefix} ${message}${os.EOL}`;
 
     // Handle logname argument
     if (options.logName !== undefined && options.logName !== '') {
@@ -48,27 +48,33 @@ module.exports = function(message, options = { 'logName': '', 'stdOut': true }) 
     // Strip color codes from logs
     // line = stripColors(line);
 
+    // Build strings
+    const strBeginLog = `BEGIN RAAGI LOG FOR ${today}${os.EOL}`;
+    const strCreatedLog = `${prefix} Created new log >> ${file}`;
+    const strLogCreationFailed = `${prefix} LOG FILE CREATION FAILED AT ${time} FOR FILE: ${file}`;
+    const strFileLoggingFailed = `${prefix} FILE LOGGING FAILED AT ${time} FOR MSG: ${fileLine}`;
+
     // Begin log file ops
     fs.exists(file, function(exists) {
         if (exists) {
             // Write log entry
-            fs.appendFile(file, `${fileLine}${os.EOL}`, function(err) {
+            fs.appendFile(file, fileLine, function(err) {
                 if (err) {
-                    return console.log(`${prefix} FILE LOGGING FAILED AT ${time} FOR MSG: ${fileLine}`);
+                    return console.log(strFileLoggingFailed);
                 }
             });
         } else {
             // Create the file
-            fs.writeFile(file, `BEGIN RAAGI LOG FOR ${today}${os.EOL}`, function(err) {
+            fs.writeFile(file, strBeginLog, function(err) {
                 if (err) {
-                    return console.log(`${prefix} LOG FILE CREATION FAILED AT ${time} FOR FILE: ${file}`);
+                    return console.log(strLogCreationFailed);
                 }
-                console.log(`${prefix} Created new log >> ${file}`);
+                console.log(strCreatedLog);
             });
             // Write log entry
-            fs.appendFile(file, `${fileLine}${os.EOL}`, function(err) {
+            fs.appendFile(file, fileLine, function(err) {
                 if (err) {
-                    return console.log(`${prefix} FILE LOGGING FAILED AT ${time} FOR MSG: ${fileLine}`);
+                    return console.log(strFileLoggingFailed);
                 }
             });
         }

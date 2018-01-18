@@ -18,6 +18,13 @@ const log = require('./modules/log.js');
 const conf = JSON.parse(fs.readFileSync('./config.json'));
 const version = require('./package').version;
 
+// Static strings
+const strServiceInit = `Init kiwi/raagi | v${version} | *:${conf.port} | SSL: ${conf.ssl.enabled}`;
+const strServiceUp = `Service up. Listening on *:${conf.port}`;
+const strServiceUnavailable = `Service unavailable. Please retry later. If this error persists, contact an engineer.`;
+const strForceShutdown = `[raagi] Could not close connections in time, forcefully shutting down!`;
+const strInitShutdown = `Init service shutdown`;
+
 // HTTP server variable
 let srv;
 
@@ -33,7 +40,7 @@ var timeoutOptions = {
     timeout: conf.timeout,
     onTimeout: function(req, res) {
         req.timedout = true;
-        res.status(503).send('Service unavailable. Please retry later. If this error persists, contact an engineer.');
+        res.status(503).send(strServiceUnavailable);
     },
     onDelayedResponse: function(req, method, args, requestTime) {
         console.log(`Attempted to call ${method} after timeout`);
@@ -54,7 +61,7 @@ app.use(bodyParser.urlencoded({ // to support URL-encoded bodies
 // KIWI-Raagi-Auth-Token
 // Response Code: (401 Unauthorized)
 app.use(function(req, res, next) {
-    if (req.header("KIWI-Raagi-Auth-Token") !== conf.authtoken) {
+    if (req.header('KIWI-Raagi-Auth-Token') !== conf.authToken) {
         log(`Auth failed: ${req.ip}`);
         res.sendStatus(401);
         res.end();
@@ -207,7 +214,7 @@ app.get('/status/:sid', (req, res) => {
         url: `${conf.ssl.prefix}://localhost:${conf.port}/`,
         method: 'POST',
         headers: {
-            'KIWI-Raagi-Auth-Token': conf.authtoken
+            'KIWI-Raagi-Auth-Token': conf.authToken
         },
         form: {
             sid: req.params.sid,
@@ -223,9 +230,9 @@ app.get('/status/:sid', (req, res) => {
     request(options, (error, response, body) => {
         if (!error && response.statusCode == 200) {
             // Build information
-            let humanSplit = body.split("humans")[0].split(" ");
+            let humanSplit = body.split('humans')[0].split(' ');
             let humans = humanSplit[humanSplit.length - 2];
-            let botSplit = body.split("bots")[0].split(" ");
+            let botSplit = body.split('bots')[0].split(' ');
             let bots = botSplit[botSplit.length - 2];
             // Set response data
             respObject.sid = req.params.sid;
@@ -255,15 +262,16 @@ app.get('/status/:sid', (req, res) => {
 if (conf.ssl.enabled) {
     // Configure SSL
     let options = {
-        key: fs.readFileSync(conf.ssl.pkeyfile),
-        cert: fs.readFileSync(conf.ssl.certfile)
+        key: fs.readFileSync(conf.ssl.pKeyFile),
+        cert: fs.readFileSync(conf.ssl.certFile)
     };
     // Listen for requests
-    srv = https.createServer(options, app).listen(conf.port, () => { /* Do stuff... */ log(`Service up. Listening on *:${conf.port}`); });
+    srv = https.createServer(options, app).listen(conf.port, () => { /* Do stuff... */ log(strServiceUp); });
     srv.timeout = conf.timeout;
 } else {
     //No SSL
-    srv = app.listen(conf.port, () => { /* Do stuff... */ log(`Service up. Listening on *:${conf.port}`); });
+    srv = app.listen(conf.port, () => { /* Do stuff... */ log(strServiceUp); });
+    srv.
     srv.timeout = conf.timeout;
 }
 
@@ -271,12 +279,12 @@ if (conf.ssl.enabled) {
 function terminate() {
     // Hard quit if service cannot gracefully shutdown after 10 seconds
     setTimeout(function() {
-        console.error('[raagi] Could not close connections in time, forcefully shutting down!');
+        console.error(strForceShutdown);
         process.exit(1);
     }, 10 * 1000);
     // Attempt a graceful shutdown on SIGTERM
     srv.close(function() {
-        log('Init service shutdown');
+        log(strInitShutdown);
         process.exit(0);
         // Close db, rcon connections, and etc...
     });
@@ -293,4 +301,4 @@ process.on('SIGINT', function() {
 });
 
 ascii(); // Print ascii and startup information
-log(`Init kiwi/raagi | v${version} | *:${conf.port} | SSL: ${conf.ssl.enabled}`);
+log(strServiceInit);
