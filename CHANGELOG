@@ -4,6 +4,14 @@
 - Deletion     |
 ---------------
 
+== 1.5.1 ==
+- Removed service name, and color codes from file logging
+~ Standardized constant strings throughout project
++ Added color code stripper in log.js
+~ Made ascii.js modular
+~ camelCased config.js variable names
+~ Minor README fixes
+
 == 1.5.0 ==
 ~ Overhauled log.js for speed and verbosity
     ~ Templatized strings
