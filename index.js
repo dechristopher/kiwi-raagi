@@ -259,11 +259,11 @@ if (conf.ssl.enabled) {
         cert: fs.readFileSync(conf.ssl.certfile)
     };
     // Listen for requests
-    srv = https.createServer(options, app).listen(conf.port, () => { /* Do stuff... */ log(`Service up. Lisening on *:${conf.port}`); });
+    srv = https.createServer(options, app).listen(conf.port, () => { /* Do stuff... */ log(`Service up. Listening on *:${conf.port}`); });
     srv.timeout = conf.timeout;
 } else {
     //No SSL
-    srv = app.listen(conf.port, () => { /* Do stuff... */ log(`Service up. Lisening on *:${conf.port}`); });
+    srv = app.listen(conf.port, () => { /* Do stuff... */ log(`Service up. Listening on *:${conf.port}`); });
     srv.timeout = conf.timeout;
 }
 
