@@ -54,30 +54,37 @@ module.exports = function(message, options = { 'logName': '', 'stdOut': true }) 
     const strLogCreationFailed = `${prefix} LOG FILE CREATION FAILED AT ${time} FOR FILE: ${file}`;
     const strFileLoggingFailed = `${prefix} FILE LOGGING FAILED AT ${time} FOR MSG: ${fileLine}`;
 
-    // Begin log file ops
-    fs.exists(file, function(exists) {
-        if (exists) {
-            // Write log entry
-            fs.appendFile(file, fileLine, function(err) {
-                if (err) {
-                    return console.log(strFileLoggingFailed);
-                }
-            });
-        } else {
-            // Create the file
-            fs.writeFile(file, strBeginLog, function(err) {
-                if (err) {
-                    return console.log(strLogCreationFailed);
-                }
-                console.log(strCreatedLog);
-            });
-            // Write log entry
-            fs.appendFile(file, fileLine, function(err) {
-                if (err) {
-                    return console.log(strFileLoggingFailed);
-                }
-            });
-        }
+    return new Promise(function(resolve, reject) {
+        // Begin log file ops
+        fs.exists(file, function(exists) {
+            if (exists) {
+                // Write log entry
+                fs.appendFile(file, fileLine, function(err) {
+                    if (err) {
+                        console.log(strFileLoggingFailed);
+                        reject(err);
+                    }
+                    resolve();
+                });
+            } else {
+                // Create the file
+                fs.writeFile(file, strBeginLog, function(err) {
+                    if (err) {
+                        console.log(strLogCreationFailed);
+                        reject(err);
+                    }
+                    console.log(strCreatedLog);
+                });
+                // Write log entry
+                fs.appendFile(file, fileLine, function(err) {
+                    if (err) {
+                        console.log(strFileLoggingFailed);
+                        reject(err);
+                    }
+                    resolve();
+                });
+            }
+        });
     });
 };
 
