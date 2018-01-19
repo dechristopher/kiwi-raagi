@@ -28,13 +28,6 @@ const strInitShutdown = `Init service shutdown`;
 // HTTP server variable
 let srv;
 
-// Set http prefix
-if (conf.ssl.enabled) {
-    conf.ssl.prefix = "https";
-} else {
-    conf.ssl.prefix = "http";
-}
-
 // Set up timeout middleware options
 var timeoutOptions = {
     timeout: conf.timeout,
@@ -128,11 +121,11 @@ app.use('/status/:sid', function(req, res, next) {
     }
 });
 
-// Respond with service version in format:
-// Response Format (JSON) : {"version":"..."}
+// Respond with service version and some of the configuration in format:
+// Response Format (JSON) : {"status": "online", "version":"...", "port": xxxx, "timeout": xxxx, "ssl.enabled": true/false}
 app.get('/', (req, res) => {
     res.setHeader('Content-Type', 'application/json');
-    res.send(`{"version":"${version}"}`);
+    res.send(`{"status": "online", version":"${version}", "port": ${conf.port}, "timeout": ${conf.timeout}, "ssl.enabled": ${conf.ssl.enabled}}`);
     log(`[GET /] ( ${req.ip} )`);
 });
 
@@ -258,8 +251,19 @@ app.get('/status/:sid', (req, res) => {
     });
 });
 
+// Initiate service shutdown
+// Response Format (JSON): {"status": "shutdown"}
+app.post('/shutdown', function(req, res) {
+    res.setHeader('Content-Type', 'application/json');
+    res.send(`{"status": "shutdown"}`);
+    // Initiate shutdown procedures
+    terminate();
+});
+
 // SSL Mode Logic
 if (conf.ssl.enabled) {
+    // Set HTTP prefix
+    conf.ssl.prefix = "https";
     // Configure SSL
     let options = {
         key: fs.readFileSync(conf.ssl.pKeyFile),
@@ -269,6 +273,8 @@ if (conf.ssl.enabled) {
     srv = https.createServer(options, app).listen(conf.port, () => { /* Do stuff... */ log(strServiceUp); });
     srv.timeout = conf.timeout;
 } else {
+    // Set HTTP prefix
+    conf.ssl.prefix = "http";
     //No SSL
     srv = app.listen(conf.port, () => { /* Do stuff... */ log(strServiceUp); });
     srv.
