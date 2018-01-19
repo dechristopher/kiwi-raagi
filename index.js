@@ -22,7 +22,7 @@ const version = require('./package').version;
 const strServiceInit = `Init kiwi/raagi | v${version} | *:${conf.port} | SSL: ${conf.ssl.enabled}`;
 const strServiceUp = `Service up. Listening on *:${conf.port}`;
 const strServiceUnavailable = `Service unavailable. Please retry later. If this error persists, contact an engineer.`;
-const strForceShutdown = `[raagi] Could not close connections in time, forcefully shutting down!`;
+const strForceShutdown = `Could not close connections in time, forcefully shutting down!`;
 const strInitShutdown = `Init service shutdown`;
 
 // HTTP server variable
@@ -257,7 +257,9 @@ app.post('/shutdown', function(req, res) {
     res.setHeader('Content-Type', 'application/json');
     res.send(`{"status": "shutdown"}`);
     // Initiate shutdown procedures
-    terminate();
+    log(`[POST /shutdown] ( ${req.ip} )`).then(() => {
+        terminate();
+    });
 });
 
 // SSL Mode Logic
@@ -285,14 +287,18 @@ if (conf.ssl.enabled) {
 function terminate() {
     // Hard quit if service cannot gracefully shutdown after 10 seconds
     setTimeout(function() {
-        console.error(strForceShutdown);
-        process.exit(1);
+        log(strForceShutdown).then(() => {
+            // Terminate with exit code 1
+            process.exit(1);
+        });
     }, 10 * 1000);
     // Attempt a graceful shutdown on SIGTERM
     srv.close(function() {
-        log(strInitShutdown);
-        process.exit(0);
-        // Close db, rcon connections, and etc...
+        log(strInitShutdown).then(() => {
+            // Close db, rcon connections, and etc...
+            // Terminate with exit code 0
+            process.exit(0);
+        });
     });
 }
 
