@@ -1,5 +1,14 @@
 // kiwi/raagi - Created January 2nd, 2018
 
+/*
+GOODLUCK
+TRIFORCE
+   ▲
+ ▲  ▲
+PRAY FOR
+NO CRASH
+*/
+
 // NPM modules
 const express = require('express');
 const bodyParser = require('body-parser');
