@@ -58,6 +58,8 @@ All endpoints require the "**KIWI-Raagi-Auth-Token**" header to be set properly 
     }
     ```
 
+* [ POST /shutdown ] Terminates service immediately after response is received
+
 ## Configuration
 
 1. Begin by running '**npm install**' from the root project directory
