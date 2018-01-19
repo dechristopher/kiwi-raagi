@@ -4,6 +4,10 @@
 - Deletion     |
 ---------------
 
+== 1.5.2 ==
++ Added POST /shutdown endpoint for terminating the service
+~ Modified HTTP prefix configuration control flow
+
 == 1.5.1 ==
 - Removed service name, and color codes from file logging
 ~ Standardized constant strings throughout project
