@@ -19,7 +19,7 @@ const LOG = `[${c.green('raagi')} ~ ${hostname}]`;
             stdOut: 'whether or not to print log to console' (default: true)
         }
 */
-module.exports = function(message, options = { 'logName': '', 'stdOut': true }) {
+module.exports = function(message, options = { 'logName': '', 'stdOut': true, 'usePrefix': true }) {
     // Define date formats for current function call
     let time = datetime.create().format('m-d-y H:M:S');
     let today = datetime.create().format('m-d-y');
@@ -38,6 +38,11 @@ module.exports = function(message, options = { 'logName': '', 'stdOut': true }) 
     if (options.logName !== undefined && options.logName !== '') {
         file = `logs/${today}-${options.logName}.log`;
         line = `${prefix} [${options.logName}] ${message}`;
+    }
+
+    if (!options.usePrefix) {
+        line = `${message}`;
+        fileLine = `${message}`;
     }
 
     // Handle consoleOut argument
