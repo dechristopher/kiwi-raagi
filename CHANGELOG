@@ -4,6 +4,10 @@
 - Deletion     |
 ---------------
 
+== 1.5.4 ==
++ Added usePrefix option to log.js
++ Log a tilde between runs of the service after shutdown
+
 == 1.5.3 ==
 + Promisified log.js
 + Added logging to POST /shutdown
