@@ -18,6 +18,7 @@ const request = require('request');
 const timeout = require('express-timeout-handler');
 const rcon = require('srcds-rcon');
 const fs = require('fs');
+const os = require('os');
 
 // Custom modules
 const ascii = require('./modules/ascii.js');
@@ -297,16 +298,20 @@ function terminate() {
     // Hard quit if service cannot gracefully shutdown after 10 seconds
     setTimeout(function() {
         log(strForceShutdown).then(() => {
-            // Terminate with exit code 1
-            process.exit(1);
+            log(`${os.EOL}~${os.EOL}${os.EOL}`, { stdOut: false, usePrefix: false }).then(() => {
+                // Terminate with exit code 1
+                process.exit(1);
+            });
         });
     }, 10 * 1000);
     // Attempt a graceful shutdown on SIGTERM
     srv.close(function() {
         log(strInitShutdown).then(() => {
-            // Close db, rcon connections, and etc...
-            // Terminate with exit code 0
-            process.exit(0);
+            log(`${os.EOL}~${os.EOL}${os.EOL}`, { stdOut: false }).then(() => {
+                // Close db, rcon connections, and etc...
+                // Terminate with exit code 0
+                process.exit(0);
+            });
         });
     });
 }
